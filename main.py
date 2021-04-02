@@ -44,15 +44,19 @@ def compare_rects(rect1, rect2):
 def find_uncrossed(rects):
     print("ищу...")
     unx = rects
+    needs_removing = False
     for r in rects:
         for r1 in rects:
             if r1 != r:
                 if not compare_rects(r, r1):
+                    needs_removing = True
                     try:
-                        unx.remove(r)
                         unx.remove(r1)
                     except:
                         continue
+        if needs_removing:
+            unx.remove(r)
+            needs_removing = False
     print()
     print('нашёл!')
     for r in unx:
