@@ -1,3 +1,6 @@
+from random import random, randint
+
+
 class rectangle:
     def __init__(self, x1, y1, x2, y2):
         if x1 > x2:
@@ -12,29 +15,50 @@ class rectangle:
         self.p2 = (x2, y2)
 
     def info(self):
-        print(self.p1, ' ', self.p2)
+        return self.p1, self.p2
+
+
+def rect_generator(n):
+    while n > 0:
+        yield rectangle(randint(-10, 10), randint(-10, 10), randint(-10, 10), randint(-10, 10))
+        n -= 1
+
+
+def decorator_log(func):
+    def wrapper(args):
+        print('Ищу неперекрытые прямоугольники')
+        return func(args)
+
+    return wrapper
 
 
 def compare_rects(rect1, rect2):
-    c1 = rect1.p1[1] <= rect2.p2[1]
-    c2 = rect1.p2[1] >= rect2.p1[1]
-    c3 = rect1.p2[0] <= rect2.p1[0]
+    c1 = rect1.p1[1] >= rect2.p2[1]
     c4 = rect1.p1[0] >= rect2.p2[0]
+    c2 = rect1.p2[1] <= rect2.p1[1]
+    c3 = rect1.p2[0] <= rect2.p1[0]
     return c1 or c2 or c3 or c4
 
 
+@decorator_log
 def find_uncrossed(rects):
-    uncrossed = rects
+    print("ищу...")
+    unx = rects
     for r in rects:
         for r1 in rects:
-            if compare_rects(r, r1):
-                try:
-                    uncrossed.remove(r)
-                    uncrossed.remove(r1)
-                except:
-                    continue
+            if r1 != r:
+                if not compare_rects(r, r1):
+                    try:
+                        unx.remove(r)
+                        unx.remove(r1)
+                    except:
+                        continue
+    print()
+    print('нашёл!')
+    for r in unx:
+        print(r.info())
 
-    return uncrossed
+    return unx
 
 
 def read_rects(file):
@@ -43,14 +67,15 @@ def read_rects(file):
     rectangles = list()
     for l in lines:
         points = l.split(" ")
-        r = rectangle(points[0], points[1], points[2], points[3])
-        r.info()
+        r = rectangle(int(points[0]), int(points[1]), int(points[2]), int(points[3]))
+        print(r.info())
         rectangles.append(r)
     return rectangles
 
 
 if __name__ == '__main__':
     rects = read_rects('test1.txt')
+    for r in rect_generator(10):
+        rects.append(r)
+        print(r.info())
     uncrossed = find_uncrossed(rects)
-    print("---------")
-    print(uncrossed[0].info())
